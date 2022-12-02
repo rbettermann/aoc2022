@@ -1,4 +1,6 @@
 class Day01 {
+
+
     private fun parseInput(input: String): List<List<Int>> {
         return input.split("\n\n").map { it.split("\n") }.map { it.map { it.toInt() } }
     }

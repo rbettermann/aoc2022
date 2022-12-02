@@ -1,23 +1,23 @@
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
-class Day01Test : FunSpec({
-    val day01 = Day01()
+class Day02Test : FunSpec({
+    val day02 = Day02()
 
     test("part1 example") {
-        day01.part1(loadResource("example")) shouldBe 24000
+        day02.part1(loadResource("example")) shouldBe 15
     }
 
     test("part1 input") {
-        day01.part1(loadResource("input")) shouldBe 66186
+        day02.part1(loadResource("input")) shouldBe 8890
     }
 
     test("part2 example") {
-        day01.part2(loadResource("example")) shouldBe 45000
+        day02.part2(loadResource("example")) shouldBe 12
     }
 
     test("part2 input") {
-        day01.part2(loadResource("input")) shouldBe 196804
+        day02.part2(loadResource("input")) shouldBe 10238
     }
 }) {
     companion object {
