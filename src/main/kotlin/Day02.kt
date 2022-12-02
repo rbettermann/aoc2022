@@ -1,85 +1,60 @@
 class Day02 {
-    companion object {
-        val ScoreLookup = mapOf(
-            "A" to 1, //Schere
-            "B" to 2, //Stein
-            "C" to 3,  //Papier
-        )
+    enum class Draws(val points: Int, val win: String, val loose: String) {
+        SCISSORS(1, "PAPER", "ROCK"),
+        ROCK(2, "SCISSORS", "PAPER"),
+        PAPER(3, "ROCK", "SCISSORS")
+    }
 
-        val LooseLookup = mapOf(
-            "B" to "A",
-            "C" to "B",
-            "A" to "C",
-        )
-        val WinLookup = mapOf(
-            "A" to "B",
-            "B" to "C",
-            "C" to "A",
-        )
+    enum class Outcome {
+        LOOSE,
+        DRAW,
+        WIN
+    }
+
+    private fun String.toDraw(): Draws {
+        return when (this) {
+            "A" -> Draws.SCISSORS
+            "B" -> Draws.ROCK
+            "C" -> Draws.PAPER
+            else -> throw AssertionError()
+        }
+    }
+
+    private fun String.toOutcome(): Outcome {
+        return when (this) {
+            "X" -> Outcome.LOOSE
+            "Y" -> Outcome.DRAW
+            "Z" -> Outcome.WIN
+            else -> throw AssertionError()
+        }
+    }
+
+    private fun parseInput(input: String) = input.split("\n").map { it.trim().split(" ") }
+    private fun calculatePoints(opponentDraw: Draws, myDraw: Draws): Int {
+        return when (opponentDraw) {
+            myDraw -> 3 + myDraw.points
+            Draws.valueOf(myDraw.win) -> 6 + myDraw.points
+            else -> myDraw.points
+        }
+    }
+
+    private fun calculateDraw(opponent: Draws, me: Outcome): Draws {
+        return when (me) {
+            Outcome.LOOSE -> Draws.valueOf(opponent.win)
+            Outcome.DRAW -> opponent
+            Outcome.WIN -> Draws.valueOf(opponent.loose)
+        }
     }
 
     fun part1(input: String): Int {
-        val lookup = mapOf(
-            "X" to "A",
-            "Y" to "B",
-            "Z" to "C"
-        )
-        val parsed = input.split("\n").map { it.trim().split(" ") }
-            .map { listOf(it[0], lookup[it[1]]!!) }
-
-        val points = parsed.map {
-            val points = calculatePoints(it[0], it[1])
-            println(points)
-            points
-        }.sum()
-
-        return points
-    }
-
-    private fun calculatePoints(a: Any, b: Any): Int {
-        if (a == b) {
-            return 3 + ScoreLookup[b]!!
-        } else {
-            if (a == "A") {
-                if (b == "B") {
-                    return 6 + ScoreLookup[b]!!
-                } else {
-                    return ScoreLookup[b]!!
-                }
-
-            } else if (a == "B") {
-                if (b == "C") {
-                    return 6 + ScoreLookup[b]!!
-                } else {
-                    return ScoreLookup[b]!!
-                }
-            } else if (a == "C") {
-                if (b == "A") {
-                    return 6 + ScoreLookup[b]!!
-                } else {
-                    return ScoreLookup[b]!!
-                }
-            }
-        }
-        throw NotImplementedError()
+        val translateToDraw = mapOf("X" to "A", "Y" to "B", "Z" to "C")
+        val parsed = parseInput(input).map { listOf(it[0], translateToDraw[it[1]]!!) }
+        return parsed.sumOf { calculatePoints(it[0].toDraw(), it[1].toDraw()) }
     }
 
     fun part2(input: String): Int {
-        val parsed = input.split("\n").map { it.trim().split(" ") }
-        return parsed.map { listOf(it[0], calculateStep(it[0], it[1])) }.map { calculatePoints(it[0], it[1]) }.sum()
-    }
-
-    private fun calculateStep(oponent: String, me: String): Any {
-        if (me == "X") { //LOOSE
-            return LooseLookup[oponent]!!
-        }
-        if (me == "Y") { //DRAW
-            return oponent
-        }
-        if (me == "Z") { //WIN
-            return WinLookup[oponent]!!
-        }
-
-        throw NotImplementedError()
+        return parseInput(input)
+            .map { listOf(it[0].toDraw(), calculateDraw(it[0].toDraw(), it[1].toOutcome())) }
+            .sumOf { calculatePoints(it[0], it[1]) }
     }
 }
