@@ -10,17 +10,17 @@ class Day03 {
 
     private fun findSameChars(first: String, second: String): Int {
         return characterToPriority(
-            first.chars().toArray()
-                .intersect(second.chars().toArray().toSet())
+            first.toSet()
+                .intersect(second.toSet())
                 .first().toChar()
         )
     }
 
     private fun calculateForGroup(a: String, b: String, c: String): Int {
         return characterToPriority(
-            a.chars().toArray()
-                .intersect(b.chars().toArray().toSet())
-                .intersect(c.chars().toArray().toSet())
+            a.toCharArray()
+                .intersect(b.toCharArray().toSet())
+                .intersect(c.toCharArray().toSet())
                 .first().toChar()
         )
     }
