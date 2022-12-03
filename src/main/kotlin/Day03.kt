@@ -9,18 +9,20 @@ class Day03 {
     }
 
     private fun findSameChars(first: String, second: String): Int {
-        val firstD = first.chars().distinct().toArray()
-        val secondD = second.chars().distinct().toArray()
-        val intersect = firstD.intersect(secondD.toSet()).first()
-        return characterToPriority(intersect.toChar())
+        return characterToPriority(
+            first.chars().toArray()
+                .intersect(second.chars().toArray().toSet())
+                .first().toChar()
+        )
     }
 
     private fun calculateForGroup(a: String, b: String, c: String): Int {
-        val aD = a.chars().distinct().toArray()
-        val bD = b.chars().distinct().toArray()
-        val cD = c.chars().distinct().toArray()
-
-        return characterToPriority(aD.intersect(bD.toSet()).intersect(cD.toSet()).first().toChar())
+        return characterToPriority(
+            a.chars().toArray()
+                .intersect(b.chars().toArray().toSet())
+                .intersect(c.chars().toArray().toSet())
+                .first().toChar()
+        )
     }
 
     fun part1(input: String): Int {
