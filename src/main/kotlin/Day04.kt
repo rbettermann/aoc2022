@@ -1,53 +1,18 @@
 class Day04 {
-
-    private fun split(input: String): Pair<Int,Int> {
+    private fun calculateRange(input: String): IntRange {
         val s = input.split("-")
-        return Pair(s[0].toInt(), s[1].toInt())
+        return s[0].toInt() until s[1].toInt() + 1
     }
 
-    fun part1(input: String): Int {
-        val parsed = parseInput(input)
+    private fun parseInput(input: String) = input.split("\n").map { it.split(",") }
+        .map { listOf(calculateRange(it[0]), calculateRange(it[1])) }
 
-        return parsed.count { isOverlapping(it[0], it[1]) }
-    }
+    private fun isFullyOverlapping(r1: IntRange, r2: IntRange) =
+        r1.contains(r2.first) && r1.contains(r2.last) || r2.contains(r1.first) && r2.contains(r1.last)
 
-    private fun parseInput(input: String) =
-        input.split("\n").map { it.split(",") }.map { listOf(split(it[0]), split(it[1])) }
+    private fun isPartiallyOverlapping(r1: IntRange, r2: IntRange) =
+        r1.intersect(r2).isNotEmpty() || r2.intersect(r1).isNotEmpty()
 
-    private fun isOverlapping(a: Pair<Int,Int>, b: Pair<Int,Int>): Boolean {
-        val r1 = a.first until a.second + 1
-        val r2 = b.first until b.second + 1
-
-
-        var result = false
-        if (r1.contains(r2.first) && r1.contains(r2.last)) {
-            result =  true
-        } else if (r2.contains(r1.first) && r2.contains(r1.last)) {
-            result = true
-        } else
-            result = false
-
-       // println("$r1 $r2 $result")
-
-        return result
-    }
-
-    fun part2(input: String): Int {
-        val parsed = parseInput(input)
-        return parsed.count { isOverlappingPartial(it[0], it[1]) }
-    }
-
-    private fun isOverlappingPartial(a: Pair<Int, Int>, b: Pair<Int, Int>): Boolean {
-        val r1 = a.first until a.second + 1
-        val r2 = b.first until b.second + 1
-
-        if (r1.intersect(r2).isNotEmpty()) {
-            return true
-        }
-        if (r2.intersect(r1).isNotEmpty()) {
-            return true
-        }
-        return false
-
-    }
+    fun part1(input: String) = parseInput(input).count { isFullyOverlapping(it[0], it[1]) }
+    fun part2(input: String): Int = parseInput(input).count { isPartiallyOverlapping(it[0], it[1]) }
 }
