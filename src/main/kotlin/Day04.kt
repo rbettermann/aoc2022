@@ -1,7 +1,7 @@
 class Day04 {
     private fun calculateRange(input: String): IntRange {
         val s = input.split("-")
-        return s[0].toInt() until s[1].toInt() + 1
+        return s[0].toInt() .. s[1].toInt()
     }
 
     private fun parseInput(input: String) = input.split("\n").map { it.split(",") }
