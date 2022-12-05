@@ -1,14 +1,27 @@
 class Day05 {
+    private fun parseInstructions(input: String): List<List<Int>> {
+        val instructions = input.split("\n\n")[1]
+            .split("\n").map {
+                it.replace("move", "")
+                    .replace("from", ",")
+                    .replace("to", ",").split(",")
+                    .filter { it.isNotEmpty() }
+                    .map { it.trim().toInt() }
+            }.filter { it.isNotEmpty() }
+        return instructions
+    }
 
-    fun part1(input: String): String {
+    private fun parseStacks(input: String): List<ArrayDeque<String>> {
         val stack = input.split("\n\n")[0].split("\n")
         val stackAlone = stack.subList(0, stack.lastIndex).joinToString("\n")
             .replace("    [", "[$] [")
             .replace("]    ", "] [$]")
             .replace("    ", " [$]")
 
+        val numberOfStacks = stackAlone.split("\n")[0].count { it == '[' }
+
         val stacks = mutableListOf<ArrayDeque<String>>()
-        (0 until 10).forEach { _ -> stacks.add(ArrayDeque()) }
+        (0 until numberOfStacks).forEach { _ -> stacks.add(ArrayDeque()) }
 
         stackAlone.split("\n").map { it.split(" ") }
             .forEach {
@@ -20,65 +33,29 @@ class Day05 {
                     }
                 }
             }
+        return stacks
+    }
 
-        val instructions = input.split("\n\n")[1]
-            .split("\n").map {
-                it.replace("move", "")
-                    .replace("from", ",")
-                    .replace("to", ",").split(",")
-                    .filter { it.isNotEmpty() }
-                    .map { it.trim().toInt()}
-            }.filter { it.isNotEmpty() }
-
-        println("before $stacks")
+    fun part1(input: String): String {
+        val stacks = parseStacks(input)
+        val instructions = parseInstructions(input)
 
         instructions.forEach {
             val number = it[0]
             val from = it[1] - 1
             val to = it[2] - 1
 
-            //println("move $number from $from to $to")
-
             (0 until number).forEach {
-                //println("X $it $number")
                 stacks[to].addFirst(stacks[from].removeFirst())
             }
-
-            //println(stacks)
         }
 
         return stacks.map { it.firstOrNull() }.filterNotNull().joinToString("")
     }
 
     fun part2(input: String): String {
-        val stack = input.split("\n\n")[0].split("\n")
-        val stackAlone = stack.subList(0, stack.lastIndex).joinToString("\n")
-            .replace("    [", "[$] [")
-            .replace("]    ", "] [$]")
-            .replace("    ", " [$]")
-
-        val stacks = mutableListOf<ArrayDeque<String>>()
-        (0 until 10).forEach { _ -> stacks.add(ArrayDeque()) }
-
-        stackAlone.split("\n").map { it.split(" ") }
-            .forEach {
-                it.forEachIndexed { index, value ->
-                    if (value == "[$]") {
-                        //do nothing
-                    } else {
-                        stacks[index].addLast(value.replace("[", "").replace("]", ""))
-                    }
-                }
-            }
-
-        val instructions = input.split("\n\n")[1]
-            .split("\n").map {
-                it.replace("move", "")
-                    .replace("from", ",")
-                    .replace("to", ",").split(",")
-                    .filter { it.isNotEmpty() }
-                    .map { it.trim().toInt()}
-            }.filter { it.isNotEmpty() }
+        val stacks = parseStacks(input)
+        val instructions = parseInstructions(input)
 
         instructions.forEach {
             val number = it[0]
@@ -91,7 +68,6 @@ class Day05 {
                 stacks[to].addFirst(it)
             }
         }
-
-        return stacks.map { it.firstOrNull() }.filterNotNull().joinToString("")
+        return stacks.joinToString("") { it.first() }
     }
 }
