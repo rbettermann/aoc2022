@@ -6,98 +6,82 @@ class Day07 {
 
     class Node(
         var name: String,
-        var childs: MutableList<Node>,
+        var ancestors: MutableList<Node>,
         var type: NodeType,
-        var predecessor: Node?,
-        var size: Int = -1
-    )
+        var predecessor: Node?
+    ) {
+        fun calcSize(): Int {
+            return if (this.type == NodeType.FILE) {
+                this.name.split(" ")[0].toInt()
+            } else {
+                this.ancestors.sumOf { it.calcSize() }
+            }
+        }
+    }
 
-    private fun createFileTree(input: String): Node {
-        val parsed = input.split("\n")
-
+    private fun parseToFileTree(input: String): Node {
         val root = Node(
             name = "/",
-            childs = mutableListOf(),
+            ancestors = mutableListOf(),
             type = NodeType.DIR,
             predecessor = null,
         )
         var fp = root
 
-        parsed.drop(1).forEach {
+        input.split("\n").drop(1).forEach {
             if (it.startsWith("$ cd ..")) {
                 fp = fp.predecessor!!
             } else if (it.startsWith("$ cd")) {
                 val newDir = it.replace("$ cd", "").trim()
-                fp = fp.childs.filter { it.type == NodeType.DIR }
+                fp = fp.ancestors.filter { it.type == NodeType.DIR }
                     .filter { it.name == newDir }.first()
             } else if (it.startsWith("$ ls")) {
                 // do nothing
             } else if (it.startsWith("dir")) {
-                fp.childs.add(
+                fp.ancestors.add(
                     Node(
                         name = it.replace("dir", "").trim(),
-                        childs = mutableListOf(),
+                        ancestors = mutableListOf(),
                         type = NodeType.DIR,
                         predecessor = fp
                     )
                 )
             } else {
-                fp.childs.add(
+                fp.ancestors.add(
                     Node(
                         name = it,
-                        childs = mutableListOf(),
+                        ancestors = mutableListOf(),
                         type = NodeType.FILE,
                         predecessor = fp
                     )
                 )
             }
         }
-        root.size = calculateSize(root.childs)
         return root
-    }
-
-    private fun calculateSize(childs: MutableList<Node>): Int = childs.sumOf {
-        if (it.type == NodeType.FILE) {
-            it.size = it.name.split(" ")[0].toInt()
-        } else {
-            it.size = calculateSize(it.childs)
-        }
-        it.size
-    }
-
-    private fun iterateWithCondition(
-        root: Node,
-        border: Int,
-        condition: (Int, Int) -> Boolean
-    ): List<Node> {
-        val res = mutableListOf<Node>()
-        iterateOverAllDirs(root, border, res, condition)
-        return res
     }
 
     private fun iterateOverAllDirs(
         fp: Node,
-        border: Int,
-        res: MutableList<Node>,
-        condition: (Int, Int) -> Boolean
-    ) {
-        if (fp.type == NodeType.DIR && condition(fp.size, border)) {
-            res.add(fp)
-        }
-        fp.childs.filter { it.type == NodeType.DIR }.forEach {
-            iterateOverAllDirs(it, border, res, condition)
-        }
+        filter: (Int) -> Boolean
+    ): List<Node> {
+        assert(fp.type == NodeType.DIR)
+        return listOfNotNull(if (filter(fp.calcSize())) fp else null) +
+                fp.ancestors
+                    .filter { it.type == NodeType.DIR }
+                    .flatMap { iterateOverAllDirs(it, filter) }
     }
 
     fun part1(input: String): Int {
-        val root = createFileTree(input)
-        return iterateWithCondition(root, 100000)
-        { a, b -> a < b }.sumOf { it.size }
+        val root = parseToFileTree(input)
+        val border = 100000
+        return iterateOverAllDirs(root)
+        { dirSize -> dirSize < border }.sumOf { it.calcSize() }
     }
 
     fun part2(input: String): Int {
-        val root = createFileTree(input)
-        return iterateWithCondition(root, 30000000 - (70000000 - root.size))
-        { a, b -> a >= b }.minOf { it.size }
+        val root = parseToFileTree(input)
+        val border = 30000000 - (70000000 - root.calcSize())
+        return iterateOverAllDirs(root)
+        { dirSize -> dirSize >= border }.minOf { it.calcSize() }
     }
 }
