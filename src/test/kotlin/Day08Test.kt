@@ -5,15 +5,15 @@ class Day08Test : FunSpec({
     val day08 = Day08()
 
     test("part1 example") {
-        day08.part1(loadResource("example")) shouldBe -1
+        day08.part1(loadResource("example")) shouldBe 21
     }
 
     test("part1 input") {
-        day08.part1(loadResource("input")) shouldBe -1
+        day08.part1(loadResource("input")) shouldBe 1870
     }
 
     test("part2 example") {
-        day08.part2(loadResource("example")) shouldBe -1
+        day08.part2(loadResource("example")) shouldBe 8
     }
 
     test("part2 input") {
