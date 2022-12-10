@@ -17,7 +17,7 @@ class Day08Test : FunSpec({
     }
 
     test("part2 input") {
-        day08.part2(loadResource("input")) shouldBe -1
+        day08.part2(loadResource("input")) shouldBe 517440
     }
 
 }) {
